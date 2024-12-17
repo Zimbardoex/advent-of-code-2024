@@ -105,27 +105,20 @@ func main() {
 
 	var safeRowCount = len(fileData)
 
-	for dataline, fileRow := range fileData {
-
+	for _, fileRow := range fileData {
 		var isOrginalRowSafe = isRowSafe(fileRow)
 
 		if !isOrginalRowSafe {
 			var isDampendRowSafe bool
 
 			for index := range fileRow {
+				rowToDampen := make([]int, len(fileRow))
+				copy(rowToDampen, fileRow)
 
-				var dampendRow = removeIndex(fileRow, index)
-				if dataline == 3 {
-					for _, thing := range dampendRow {
-
-						print(thing)
-					}
-					print("\n")
-				}
+				var dampendRow = removeIndex(rowToDampen, index)
 
 				isDampendRowSafe = isRowSafe(dampendRow)
 				if isDampendRowSafe {
-					print(dataline, "safe dampend \n")
 					isDampendRowSafe = true
 					break
 				}
@@ -133,14 +126,8 @@ func main() {
 
 			if !isDampendRowSafe {
 				safeRowCount -= 1
-				print(dataline, "unsafe\n")
 			}
-
-		} else {
-
-			print(dataline, "safe\n")
 		}
-
 	}
 
 	print("Total safe lines: ", safeRowCount)
