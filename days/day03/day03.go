@@ -30,7 +30,7 @@ func getFileData(filepath string) string {
 	return string(dat)
 }
 
-func extractFunctions(str string) [][]string {
+func extractMultiplicaions(str string) [][]string {
 	r := regexp.MustCompile(`mul\((?P<multi>[0-9]+\,[0-9]+)\)`)
 
 	matches := r.FindAllStringSubmatch(str, -1)
@@ -57,7 +57,7 @@ func main() {
 	var fileData = getFileData("./data.txt")
 
 	// extract the mul(x,y)s
-	var multiplications = extractFunctions(fileData)
+	var multiplications = extractMultiplicaions(fileData)
 
 	// split, muliply and sum
 	total := multiplyAndSum(multiplications)
