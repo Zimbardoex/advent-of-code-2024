@@ -85,6 +85,7 @@ func getCountOfVisits(startingX int, startingY int, warehouseGrid []string) int 
 
 		print(" |x and y: ", x, " ", y)
 		nextX, nextY = nextPosition(x, y, xVel, yVel)
+		print(" |next x and y: ", nextX, " ", nextY)
 	}
 
 	return visits
