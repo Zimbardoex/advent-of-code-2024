@@ -19,14 +19,14 @@ func getFileData(filepath string) string {
 	return string(dat)
 }
 
-func convertToInteger(str string) int {
-	i, err := strconv.Atoi(str)
-	if err != nil {
-		print("string %s couldn't be parsed as an integer", str)
-		panic(err)
-	}
+func processFileData(data string) []string {
 
-	return i
+	var warehouseGrid = strings.Split(data, "\n")
+
+	for i, line := range warehouseGrid {
+		warehouseGrid[i] = strings.TrimRight(line, "\r\n")
+	}
+	return warehouseGrid
 }
 
 func getStartingLocation(warehouseData []string) (int, int) {
@@ -42,9 +42,9 @@ func getStartingLocation(warehouseData []string) (int, int) {
 	panic("starting location couldn't be found!")
 }
 
-func getCountOfVisits(startingX int, startingY int, warehouseGrid []string) int {
-	var xVel = 0
-	var yVel = -1
+func getCountOfUniqueVisits(startingX int, startingY int, warehouseGrid []string) int {
+	xVel := 0
+	yVel := -1
 
 	var x = startingX
 	var y = startingY
@@ -52,43 +52,36 @@ func getCountOfVisits(startingX int, startingY int, warehouseGrid []string) int 
 
 	var visits = 0
 
+	var vistedLocations = make(map[string]bool)
+
 	for checkPostitionValid(nextX, nextY, warehouseGrid) {
-		if warehouseGrid[nextY][nextX] == '#' {
-			// up -> right
+		// 35 = '#'
+		if warehouseGrid[nextY][nextX] == 35 {
 			if yVel == -1 {
+				// up -> right
 				xVel = 1
 				yVel = 0
-			}
-
-			// right -> down
-			if xVel == 1 {
+			} else if xVel == 1 {
+				// right -> down
 				xVel = 0
 				yVel = 1
-			}
-
-			// down -> left
-			if yVel == 1 {
+			} else if yVel == 1 {
+				// down -> left
 				xVel = -1
 				yVel = 0
-			}
-
-			// left -> up
-			if xVel == -1 {
+			} else if xVel == -1 {
+				// left -> up
 				xVel = 0
 				yVel = -1
 			}
-
 		}
+		vistedLocations[strconv.Itoa(x)+"."+strconv.Itoa(y)] = true
 		visits++
-		x = nextX
-		y = nextY
-
-		print(" |x and y: ", x, " ", y)
+		x, y = nextPosition(x, y, xVel, yVel)
 		nextX, nextY = nextPosition(x, y, xVel, yVel)
-		print(" |next x and y: ", nextX, " ", nextY)
 	}
 
-	return visits
+	return len(vistedLocations) + 1
 }
 
 func nextPosition(x int, y int, xVel int, yVel int) (int, int) {
@@ -96,19 +89,21 @@ func nextPosition(x int, y int, xVel int, yVel int) (int, int) {
 }
 
 func checkPostitionValid(x int, y int, warehouseGrid []string) bool {
-	return x > 0 && x < len(warehouseGrid[y]) && y > 0 && y < len(warehouseGrid)
+	if y < 0 || y > len(warehouseGrid)-1 {
+		return false
+	}
+	return x >= 0 && x < len(warehouseGrid[y])
 }
 
 func main() {
 	//read files
 	var warehouseData = getFileData("./data.txt")
 
-	var warehouseGrid = strings.Split(warehouseData, "\n")
+	var warehouseGrid = processFileData(warehouseData)
 
 	var x, y = getStartingLocation(warehouseGrid)
 
-	var countOfVisits = getCountOfVisits(x, y, warehouseGrid)
+	var countOfVisits = getCountOfUniqueVisits(x, y, warehouseGrid)
 
 	print("locations visted: ", countOfVisits)
-
 }
